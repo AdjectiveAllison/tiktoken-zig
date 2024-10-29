@@ -83,6 +83,10 @@ pub const Encoding = struct {
     }
 };
 
+pub fn initLogger() void {
+    c.tiktoken_init_logger();
+}
+
 pub fn encodingForModel(model_name: []const u8) !Encoding {
     return Encoding.init(model_name);
 }
@@ -137,6 +141,77 @@ pub fn tiktokenCVersion() []const u8 {
     return std.mem.span(c.tiktoken_c_version());
 }
 
+pub fn r50kBase() !Encoding {
+    const corebpe = c.tiktoken_r50k_base() orelse return error.FailedToGetBPE;
+    return Encoding{ .corebpe = @as(*CoreBPE, @ptrCast(corebpe)) };
+}
+
+pub fn p50kBase() !Encoding {
+    const corebpe = c.tiktoken_p50k_base() orelse return error.FailedToGetBPE;
+    return Encoding{ .corebpe = @as(*CoreBPE, @ptrCast(corebpe)) };
+}
+
+pub fn p50kEdit() !Encoding {
+    const corebpe = c.tiktoken_p50k_edit() orelse return error.FailedToGetBPE;
+    return Encoding{ .corebpe = @as(*CoreBPE, @ptrCast(corebpe)) };
+}
+
+pub fn cl100kBase() !Encoding {
+    const corebpe = c.tiktoken_cl100k_base() orelse return error.FailedToGetBPE;
+    return Encoding{ .corebpe = @as(*CoreBPE, @ptrCast(corebpe)) };
+}
+
+pub fn o200kBase() !Encoding {
+    const corebpe = c.tiktoken_o200k_base() orelse return error.FailedToGetBPE;
+    return Encoding{ .corebpe = @as(*CoreBPE, @ptrCast(corebpe)) };
+}
+
+test "base model constructors" {
+    // Test each base model constructor
+    {
+        var encoding = try r50kBase();
+        defer encoding.deinit();
+        const text = "Hello, world!";
+        const encoded = try encoding.encodeOrdinary(text);
+        defer std.heap.c_allocator.free(encoded);
+        try std.testing.expect(encoded.len > 0);
+    }
+
+    {
+        var encoding = try cl100kBase();
+        defer encoding.deinit();
+        const text = "Testing cl100k";
+        const encoded = try encoding.encodeOrdinary(text);
+        defer std.heap.c_allocator.free(encoded);
+        try std.testing.expect(encoded.len > 0);
+    }
+
+    {
+        var encoding = try o200kBase();
+        defer encoding.deinit();
+        const text = "Testing o200kBase";
+        const encoded = try encoding.encodeOrdinary(text);
+        defer std.heap.c_allocator.free(encoded);
+        try std.testing.expect(encoded.len > 0);
+    }
+
+    {
+        var encoding = try p50kBase();
+        defer encoding.deinit();
+        const text = "Testing p50kbase";
+        const encoded = try encoding.encodeOrdinary(text);
+        defer std.heap.c_allocator.free(encoded);
+        try std.testing.expect(encoded.len > 0);
+    }
+    {
+        var encoding = try p50kEdit();
+        defer encoding.deinit();
+        const text = "Testing p50kedit";
+        const encoded = try encoding.encodeOrdinary(text);
+        defer std.heap.c_allocator.free(encoded);
+        try std.testing.expect(encoded.len > 0);
+    }
+}
 test "basic functionality" {
     var encoding = try encodingForModel("gpt-4");
     defer encoding.deinit();
@@ -199,6 +274,11 @@ test "num tokens from messages" {
 
     const num_tokens = try numTokensFromMessages(model, &messages);
     try std.testing.expectEqual(@as(usize, 36), num_tokens);
+}
+
+test "logger initialization" {
+    // This just tests that the function doesn't crash
+    initLogger();
 }
 
 test "tiktoken c version" {
