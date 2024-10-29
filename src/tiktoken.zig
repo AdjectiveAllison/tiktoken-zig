@@ -31,18 +31,18 @@ pub const Encoding = struct {
         c.tiktoken_destroy_corebpe(@as(*c.CoreBPE, @ptrCast(self.corebpe)));
     }
 
-    pub fn encodeOrdinary(self: *Self, text: []const u8) ![]usize {
+    pub fn encodeOrdinary(self: *Self, text: []const u8) ![]u32 {
         var num_tokens: usize = 0;
         const tokens_ptr = c.tiktoken_corebpe_encode_ordinary(@as(*c.CoreBPE, @ptrCast(self.corebpe)), text.ptr, &num_tokens);
         if (tokens_ptr == null) return error.EncodingFailed;
         defer std.c.free(tokens_ptr);
 
-        const result = try std.heap.c_allocator.alloc(usize, num_tokens);
+        const result = try std.heap.c_allocator.alloc(u32, num_tokens);
         @memcpy(result, tokens_ptr[0..num_tokens]);
         return result;
     }
 
-    pub fn encode(self: *Self, text: []const u8, allowed_special: []const []const u8) ![]usize {
+    pub fn encode(self: *Self, text: []const u8, allowed_special: []const []const u8) ![]u32 {
         var num_tokens: usize = 0;
         var c_allowed_special = try std.heap.c_allocator.alloc([*c]const u8, allowed_special.len);
         defer std.heap.c_allocator.free(c_allowed_special);
@@ -55,23 +55,23 @@ pub const Encoding = struct {
         if (tokens_ptr == null) return error.EncodingFailed;
         defer std.c.free(tokens_ptr);
 
-        const result = try std.heap.c_allocator.alloc(usize, num_tokens);
+        const result = try std.heap.c_allocator.alloc(u32, num_tokens);
         @memcpy(result, tokens_ptr[0..num_tokens]);
         return result;
     }
 
-    pub fn encodeWithSpecialTokens(self: *Self, text: []const u8) ![]usize {
+    pub fn encodeWithSpecialTokens(self: *Self, text: []const u8) ![]u32 {
         var num_tokens: usize = 0;
         const tokens_ptr = c.tiktoken_corebpe_encode_with_special_tokens(@as(*c.CoreBPE, @ptrCast(self.corebpe)), text.ptr, &num_tokens);
         if (tokens_ptr == null) return error.EncodingFailed;
         defer std.c.free(tokens_ptr);
 
-        const result = try std.heap.c_allocator.alloc(usize, num_tokens);
+        const result = try std.heap.c_allocator.alloc(u32, num_tokens);
         @memcpy(result, tokens_ptr[0..num_tokens]);
         return result;
     }
 
-    pub fn decode(self: *Self, tokens: []const usize) ![]u8 {
+    pub fn decode(self: *Self, tokens: []const u32) ![]u8 {
         const decoded_ptr = c.tiktoken_corebpe_decode(@as(*c.CoreBPE, @ptrCast(self.corebpe)), tokens.ptr, tokens.len);
         if (decoded_ptr == null) return error.DecodingFailed;
         defer std.c.free(decoded_ptr);
