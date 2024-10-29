@@ -21,9 +21,7 @@ pub fn build(b: *std.Build) void {
     const rust_lib_path = "tiktoken-c/target/release/libtiktoken_c.a";
     rust_lib.addObjectFile(b.path(rust_lib_path));
 
-    // Link necessary system libraries
-    rust_lib.linkSystemLibrary("c");
-    rust_lib.linkSystemLibrary("gcc_s");
+    rust_lib.installHeader(b.path("tiktoken-c/tiktoken.h"), "tiktoken.h");
     rust_lib.linkLibC();
 
     // Create the module
@@ -41,8 +39,6 @@ pub fn build(b: *std.Build) void {
 
     main_tests.addIncludePath(b.path("tiktoken-c"));
     main_tests.addObjectFile(b.path(rust_lib_path));
-    main_tests.linkSystemLibrary("c");
-    main_tests.linkSystemLibrary("gcc_s");
     main_tests.linkLibC();
 
     const run_main_tests = b.addRunArtifact(main_tests);

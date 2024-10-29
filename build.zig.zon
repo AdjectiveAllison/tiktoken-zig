@@ -65,7 +65,7 @@
         "build.zig",
         "build.zig.zon",
         "src",
-        "tiktoken-c/",
+        "tiktoken-c",
         // For example...
         //"LICENSE",
         //"README.md",
