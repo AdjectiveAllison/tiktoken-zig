@@ -30,7 +30,7 @@ Zig bindings for [tiktoken-c](https://github.com/kojix2/tiktoken-c), providing f
         const optimize = b.standardOptimizeOption(.{});
 
         const opts = .{ .target = target, .optimize = optimize };   // 👈
-        const zai = b.dependency("tiktoken-zig", opts).module("tiktoken-zig"); // 👈
+        const tiktoken_zig = b.dependency("tiktoken-zig", opts).module("tiktoken-zig"); // 👈
 
         const exe = b.addExecutable(.{
             .name = "my-project",
@@ -39,7 +39,7 @@ Zig bindings for [tiktoken-c](https://github.com/kojix2/tiktoken-c), providing f
             .optimize = optimize,
         });
 
-        exe.root_module.addImport("tiktoken-zig", zai); // 👈
+        exe.root_module.addImport("tiktoken-zig", tiktoken_zig); // 👈
 
         // ...
     }
