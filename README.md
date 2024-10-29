@@ -1,5 +1,7 @@
 # tiktoken-zig
 
+## WIP NOT FULLY FUNCTIONAL YET
+
 Zig bindings for [tiktoken-c](https://github.com/kojix2/tiktoken-c), providing fast BPE tokenization for OpenAI models.
 
 ## Features
