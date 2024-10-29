@@ -31,6 +31,7 @@ pub fn build(b: *std.Build) void {
         .root_source_file = b.path("src/tiktoken.zig"),
     });
 
+    tiktoken_mod.linkLibrary(rust_lib);
     // Create the tests
     const main_tests = b.addTest(.{
         .root_source_file = b.path("src/tiktoken.zig"),
